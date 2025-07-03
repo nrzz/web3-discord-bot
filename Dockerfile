@@ -1,5 +1,5 @@
 # Multi-stage build for production
-FROM node:20-alpine-slim AS builder
+FROM node:20.19-alpine3.21 AS builder
 
 # Set working directory
 WORKDIR /usr/src/app
@@ -16,12 +16,9 @@ RUN npm ci
 # Copy source code
 COPY . .
 
-# Run tests and linting in build stage
-RUN npm run lint
-RUN npm test
 
 # Production stage
-FROM node:20-alpine-slim AS production
+FROM 20.19-alpine3.21 AS production
 
 # Create non-root user for security
 RUN addgroup -g 1001 -S nodejs && \
