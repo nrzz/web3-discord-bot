@@ -5,4 +5,5 @@ dist/
 build/
 coverage/
 .env
-config.env 
+config.env
+__tests__/ 
