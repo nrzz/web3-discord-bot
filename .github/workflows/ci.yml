@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [ main ]
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -57,10 +61,10 @@ jobs:
       if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev'
       run: |
         echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-        docker tag web3-discord-bot ghcr.io/${{ github.repository }}/web3-discord-bot:latest
-        docker tag web3-discord-bot ghcr.io/${{ github.repository }}/web3-discord-bot:${{ github.sha }}
-        docker push ghcr.io/${{ github.repository }}/web3-discord-bot:latest
-        docker push ghcr.io/${{ github.repository }}/web3-discord-bot:${{ github.sha }}
+        docker tag web3-discord-bot ghcr.io/${{ github.repository_owner }}/web3-discord-bot:latest
+        docker tag web3-discord-bot ghcr.io/${{ github.repository_owner }}/web3-discord-bot:${{ github.sha }}
+        docker push ghcr.io/${{ github.repository_owner }}/web3-discord-bot:latest
+        docker push ghcr.io/${{ github.repository_owner }}/web3-discord-bot:${{ github.sha }}
 
   security:
     runs-on: ubuntu-latest
