@@ -9,7 +9,7 @@ const { setupRateLimiting } = require('./utils/rateLimiter');
 const HealthServer = require('./server');
 
 class Web3DiscordBot {
-  constructor() {
+  constructor () {
     this.client = new Client({
       intents: [
         GatewayIntentBits.Guilds,
@@ -21,15 +21,15 @@ class Web3DiscordBot {
 
     this.client.commands = new Collection();
     this.client.cooldowns = new Collection();
-    
+
     // Initialize rate limiting
     this.rateLimiter = setupRateLimiting();
-    
+
     // Initialize health server
     this.healthServer = new HealthServer();
   }
 
-  async initialize() {
+  async initialize () {
     try {
       logger.info('Initializing Web3 Discord Bot...');
 
@@ -53,25 +53,24 @@ class Web3DiscordBot {
       // Login to Discord
       await this.client.login(process.env.DISCORD_TOKEN);
       logger.info('Bot logged in successfully');
-
     } catch (error) {
       logger.error('Failed to initialize bot:', error);
       process.exit(1);
     }
   }
 
-  async handleError(error) {
+  async handleError (error) {
     logger.error('Unhandled error:', error);
-    
+
     // Graceful shutdown
     if (this.healthServer) {
       await this.healthServer.stop();
     }
-    
+
     if (this.client) {
       await this.client.destroy();
     }
-    
+
     process.exit(1);
   }
 }
@@ -117,4 +116,4 @@ process.on('SIGTERM', async () => {
 bot.initialize().catch((error) => {
   logger.error('Failed to start bot:', error);
   process.exit(1);
-}); 
+});

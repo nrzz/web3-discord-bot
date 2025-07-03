@@ -6,7 +6,7 @@ module.exports = {
     .setName('networks')
     .setDescription('List supported networks and their status'),
 
-  async execute(interaction) {
+  async execute (interaction) {
     try {
       const networks = web3Service.getSupportedNetworks();
       const networkStatus = web3Service.getNetworkStatus();
@@ -21,10 +21,10 @@ module.exports = {
       const unconfiguredNetworks = networks.filter(network => !network.configured);
 
       if (configuredNetworks.length > 0) {
-        const configuredList = configuredNetworks.map(network => 
+        const configuredList = configuredNetworks.map(network =>
           `🟢 **${network.name}** (${network.symbol})`
         ).join('\n');
-        
+
         embed.addFields({
           name: '✅ Configured Networks',
           value: configuredList,
@@ -33,10 +33,10 @@ module.exports = {
       }
 
       if (unconfiguredNetworks.length > 0) {
-        const unconfiguredList = unconfiguredNetworks.map(network => 
+        const unconfiguredList = unconfiguredNetworks.map(network =>
           `🔴 **${network.name}** (${network.symbol})`
         ).join('\n');
-        
+
         embed.addFields({
           name: '❌ Unconfigured Networks',
           value: unconfiguredList + '\n\n*Add RPC URLs to config.env to enable*',
@@ -45,7 +45,7 @@ module.exports = {
       }
 
       // Add network details
-      const networkDetails = Object.entries(networkStatus).map(([network, status]) => {
+      const networkDetails = Object.entries(networkStatus).map(([_network, status]) => {
         const statusEmoji = status.connected ? '🟢' : '🔴';
         return `${statusEmoji} **${status.name}**\n   RPC: ${status.rpcUrl}`;
       }).join('\n\n');
@@ -62,7 +62,6 @@ module.exports = {
         .setTimestamp();
 
       await interaction.reply({ embeds: [embed] });
-
     } catch (error) {
       const errorEmbed = new EmbedBuilder()
         .setColor('#FF0000')
@@ -73,4 +72,4 @@ module.exports = {
       await interaction.reply({ embeds: [errorEmbed] });
     }
   }
-}; 
+};

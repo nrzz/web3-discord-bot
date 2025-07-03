@@ -7,14 +7,14 @@ module.exports = {
     .setName('status')
     .setDescription('Check bot and network status'),
 
-  async execute(interaction) {
+  async execute (interaction) {
     await interaction.deferReply();
 
     try {
       const networkStatus = web3Service.getNetworkStatus();
       const uptime = process.uptime();
       const memoryUsage = process.memoryUsage();
-      
+
       // Calculate uptime
       const days = Math.floor(uptime / 86400);
       const hours = Math.floor((uptime % 86400) / 3600);
@@ -32,7 +32,7 @@ module.exports = {
           },
           {
             name: '🌐 Network Status',
-            value: Object.entries(networkStatus).map(([network, status]) => 
+            value: Object.entries(networkStatus).map(([_network, status]) =>
               `• **${status.name}:** ${status.connected ? '🟢 Connected' : '🔴 Disconnected'}`
             ).join('\n'),
             inline: true
@@ -47,7 +47,6 @@ module.exports = {
         .setTimestamp();
 
       await interaction.editReply({ embeds: [embed] });
-
     } catch (error) {
       const errorEmbed = new EmbedBuilder()
         .setColor('#FF0000')
@@ -58,4 +57,4 @@ module.exports = {
       await interaction.editReply({ embeds: [errorEmbed] });
     }
   }
-}; 
+};

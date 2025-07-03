@@ -2,7 +2,7 @@ const { ethers } = require('ethers');
 const logger = require('../utils/logger');
 
 class Web3Service {
-  constructor() {
+  constructor () {
     this.providers = new Map();
     this.supportedNetworks = {
       ethereum: {
@@ -40,18 +40,18 @@ class Web3Service {
     };
   }
 
-  async initializeWeb3Providers() {
+  async initializeWeb3Providers () {
     logger.info('Initializing Web3 providers...');
 
     for (const [network, config] of Object.entries(this.supportedNetworks)) {
       if (config.rpcUrl) {
         try {
           const provider = new ethers.JsonRpcProvider(config.rpcUrl);
-          
+
           // Test the connection
           const blockNumber = await provider.getBlockNumber();
           logger.info(`Connected to ${config.name} (${network}) - Block: ${blockNumber}`);
-          
+
           this.providers.set(network, {
             provider,
             config
@@ -68,7 +68,7 @@ class Web3Service {
   }
 
   // Get balance for a specific address on a specific network
-  async getBalance(address, network = 'ethereum') {
+  async getBalance (address, network = 'ethereum') {
     try {
       const providerInfo = this.providers.get(network);
       if (!providerInfo) {
@@ -95,14 +95,13 @@ class Web3Service {
       return {
         network: config.name,
         symbol: config.symbol,
-        address: address,
+        address,
         balance: balanceInEth,
         balanceWei: balance.toString(),
         tokenBalances,
         explorerUrl: `${config.explorer}/address/${address}`,
         timestamp: new Date().toISOString()
       };
-
     } catch (error) {
       logger.error(`Error getting balance for ${address} on ${network}:`, error.message);
       throw error;
@@ -110,7 +109,7 @@ class Web3Service {
   }
 
   // Get balances across all supported networks
-  async getBalances(address) {
+  async getBalances (address) {
     const results = [];
     const errors = [];
 
@@ -135,14 +134,14 @@ class Web3Service {
   }
 
   // Get token balances using blockchain explorer APIs
-  async getTokenBalances(address, network) {
+  async getTokenBalances (address, network) {
     try {
       const providerInfo = this.providers.get(network);
       if (!providerInfo || !providerInfo.config.apiKey) {
         return [];
       }
 
-      const { config } = providerInfo;
+      // const { config } = providerInfo;
       const { ethers } = require('ethers');
 
       // This is a simplified version - in production, you'd want to cache results
@@ -160,7 +159,7 @@ class Web3Service {
 
           const balance = await tokenContract.balanceOf(address);
           const decimals = await tokenContract.decimals();
-          
+
           if (balance > 0) {
             const formattedBalance = ethers.formatUnits(balance, decimals);
             tokenBalances.push({
@@ -178,7 +177,6 @@ class Web3Service {
       }
 
       return tokenBalances;
-
     } catch (error) {
       logger.error(`Error getting token balances for ${address} on ${network}:`, error.message);
       return [];
@@ -186,7 +184,7 @@ class Web3Service {
   }
 
   // Get top tokens for a network (simplified - in production, use a token list API)
-  async getTopTokens(network) {
+  async getTopTokens (network) {
     const tokenLists = {
       ethereum: [
         { symbol: 'USDT', name: 'Tether USD', address: '0xdAC17F958D2ee523a2206206994597C13D831ec7' },
@@ -212,9 +210,9 @@ class Web3Service {
   }
 
   // Get network status
-  getNetworkStatus() {
+  getNetworkStatus () {
     const status = {};
-    
+
     for (const [network, providerInfo] of this.providers) {
       status[network] = {
         name: providerInfo.config.name,
@@ -227,7 +225,7 @@ class Web3Service {
   }
 
   // Get supported networks
-  getSupportedNetworks() {
+  getSupportedNetworks () {
     return Object.keys(this.supportedNetworks).map(network => ({
       id: network,
       name: this.supportedNetworks[network].name,
@@ -241,11 +239,11 @@ class Web3Service {
 const web3Service = new Web3Service();
 
 // Initialize providers
-async function initializeWeb3Providers() {
+async function initializeWeb3Providers () {
   await web3Service.initializeWeb3Providers();
 }
 
 module.exports = {
   web3Service,
   initializeWeb3Providers
-}; 
+};

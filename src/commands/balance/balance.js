@@ -22,7 +22,7 @@ module.exports = {
           { name: 'Arbitrum', value: 'arbitrum' }
         )),
 
-  async execute(interaction) {
+  async execute (interaction) {
     await interaction.deferReply();
 
     try {
@@ -46,10 +46,9 @@ module.exports = {
 
       const embed = createBalanceEmbed(result, interaction.user);
       await interaction.editReply({ embeds: [embed] });
-
     } catch (error) {
       logger.error('Error in balance command:', error);
-      
+
       const errorEmbed = new EmbedBuilder()
         .setColor('#FF0000')
         .setTitle('❌ Error')
@@ -61,7 +60,7 @@ module.exports = {
   }
 };
 
-function createBalanceEmbed(result, user) {
+function createBalanceEmbed (result, user) {
   const embed = new EmbedBuilder()
     .setColor('#00FF00')
     .setTitle('💰 Web3 Balance Check')
@@ -84,7 +83,7 @@ function createBalanceEmbed(result, user) {
     else if (value > 0) emoji = '🪙';
 
     const fieldValue = `${emoji} **${parseFloat(balance.balance).toFixed(6)} ${balance.symbol}**\n`;
-    
+
     // Add token balances if available
     let tokenInfo = '';
     if (balance.tokenBalances && balance.tokenBalances.length > 0) {
@@ -106,10 +105,10 @@ function createBalanceEmbed(result, user) {
 
   // Add error information if any
   if (result.errors && result.errors.length > 0) {
-    const errorText = result.errors.map(error => 
+    const errorText = result.errors.map(error =>
       `• ${error.network}: ${error.error}`
     ).join('\n');
-    
+
     embed.addFields({
       name: '⚠️ Errors',
       value: errorText,
@@ -118,4 +117,4 @@ function createBalanceEmbed(result, user) {
   }
 
   return embed;
-} 
+}
