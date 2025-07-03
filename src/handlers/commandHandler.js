@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const logger = require('../utils/logger');
 
-async function loadCommands(client) {
+async function loadCommands (client) {
   const commandsPath = path.join(__dirname, '../commands');
   const commandFolders = fs.readdirSync(commandsPath);
 
@@ -24,4 +24,4 @@ async function loadCommands(client) {
   }
 }
 
-module.exports = { loadCommands }; 
+module.exports = { loadCommands };

@@ -5,21 +5,21 @@ const logger = require('./utils/logger');
 const { setupRateLimiting } = require('./utils/rateLimiter');
 
 class HealthServer {
-  constructor() {
+  constructor () {
     this.app = express();
     this.port = process.env.PORT || 3000;
     this.setupMiddleware();
     this.setupRoutes();
   }
 
-  setupMiddleware() {
+  setupMiddleware () {
     // Security middleware
     this.app.use(helmet());
     this.app.use(cors());
-    
+
     // Rate limiting
     this.app.use(setupRateLimiting());
-    
+
     // Logging middleware
     this.app.use((req, res, next) => {
       logger.info(`${req.method} ${req.path} - ${req.ip}`);
@@ -27,7 +27,7 @@ class HealthServer {
     });
   }
 
-  setupRoutes() {
+  setupRoutes () {
     // Health check endpoint
     this.app.get('/health', (req, res) => {
       res.status(200).json({
@@ -55,7 +55,7 @@ class HealthServer {
     // Status endpoint with more details
     this.app.get('/status', (req, res) => {
       const { web3Service } = require('./services/web3Service');
-      
+
       res.json({
         bot: {
           status: 'running',
@@ -77,7 +77,7 @@ class HealthServer {
     });
 
     // Error handler
-    this.app.use((error, req, res, next) => {
+    this.app.use((error, req, res, _next) => {
       logger.error('HTTP Server Error:', error);
       res.status(500).json({
         error: 'Internal Server Error',
@@ -86,7 +86,7 @@ class HealthServer {
     });
   }
 
-  start() {
+  start () {
     return new Promise((resolve, reject) => {
       this.server = this.app.listen(this.port, () => {
         logger.info(`Health server started on port ${this.port}`);
@@ -100,7 +100,7 @@ class HealthServer {
     });
   }
 
-  stop() {
+  stop () {
     return new Promise((resolve) => {
       if (this.server) {
         this.server.close(() => {
@@ -114,4 +114,4 @@ class HealthServer {
   }
 }
 
-module.exports = HealthServer; 
+module.exports = HealthServer;

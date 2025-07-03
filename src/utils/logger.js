@@ -46,7 +46,7 @@ const logger = winston.createLogger({
       maxFiles: '14d',
       format: logFormat
     }),
-    
+
     // Separate error log file
     new DailyRotateFile({
       filename: path.join(logsDir, 'error.log'),
@@ -73,4 +73,4 @@ logger.stream = {
   }
 };
 
-module.exports = logger; 
+module.exports = logger;

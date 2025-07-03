@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const logger = require('../utils/logger');
 
-async function loadEvents(client) {
+async function loadEvents (client) {
   const eventsPath = path.join(__dirname, '../events');
   const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
 
@@ -20,4 +20,4 @@ async function loadEvents(client) {
   }
 }
 
-module.exports = { loadEvents }; 
+module.exports = { loadEvents };

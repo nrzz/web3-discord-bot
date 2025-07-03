@@ -2,18 +2,18 @@ const rateLimit = require('express-rate-limit');
 const logger = require('./logger');
 
 // In-memory store for rate limiting (in production, use Redis)
-const rateLimitStore = new Map();
+// const rateLimitStore = new Map();
 
 class RateLimiter {
-  constructor() {
+  constructor () {
     this.limits = new Map();
   }
 
   // Check if user is rate limited
-  isRateLimited(userId, commandName, maxRequests = 5, windowMs = 60000) {
+  isRateLimited (userId, commandName, maxRequests = 5, windowMs = 60000) {
     const key = `${userId}:${commandName}`;
     const now = Date.now();
-    
+
     if (!this.limits.has(key)) {
       this.limits.set(key, {
         requests: 1,
@@ -23,7 +23,7 @@ class RateLimiter {
     }
 
     const limit = this.limits.get(key);
-    
+
     // Reset if window has passed
     if (now > limit.resetTime) {
       this.limits.set(key, {
@@ -45,10 +45,10 @@ class RateLimiter {
   }
 
   // Get remaining requests for user
-  getRemainingRequests(userId, commandName) {
+  getRemainingRequests (userId, commandName) {
     const key = `${userId}:${commandName}`;
     const limit = this.limits.get(key);
-    
+
     if (!limit) {
       return 5; // Default max requests
     }
@@ -62,10 +62,10 @@ class RateLimiter {
   }
 
   // Get reset time for user
-  getResetTime(userId, commandName) {
+  getResetTime (userId, commandName) {
     const key = `${userId}:${commandName}`;
     const limit = this.limits.get(key);
-    
+
     if (!limit) {
       return Date.now() + 60000;
     }
@@ -74,7 +74,7 @@ class RateLimiter {
   }
 
   // Clean up expired entries
-  cleanup() {
+  cleanup () {
     const now = Date.now();
     for (const [key, limit] of this.limits.entries()) {
       if (now > limit.resetTime) {
@@ -93,7 +93,7 @@ setInterval(() => {
 }, 5 * 60 * 1000);
 
 // Setup rate limiting for HTTP endpoints
-function setupRateLimiting() {
+function setupRateLimiting () {
   return rateLimit({
     windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000, // 15 minutes
     max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100, // limit each IP to 100 requests per windowMs
@@ -115,4 +115,4 @@ function setupRateLimiting() {
 module.exports = {
   globalRateLimiter,
   setupRateLimiting
-}; 
+};

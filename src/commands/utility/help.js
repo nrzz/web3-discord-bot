@@ -5,7 +5,7 @@ module.exports = {
     .setName('help')
     .setDescription('Show help information about the Web3 Discord Bot'),
 
-  async execute(interaction) {
+  async execute (interaction) {
     const embed = new EmbedBuilder()
       .setColor('#0099FF')
       .setTitle('🤖 Web3 Discord Bot Help')
@@ -42,4 +42,4 @@ module.exports = {
 
     await interaction.reply({ embeds: [embed] });
   }
-}; 
+};
