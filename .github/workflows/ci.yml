@@ -46,12 +46,12 @@ jobs:
     - name: Build Docker image
       run: docker build -t web3-discord-bot .
     
-    - name: Test Docker image
+    - name: Test Docker image with Compose
       run: |
-        docker run --rm -d --name test-bot web3-discord-bot
+        docker compose up -d
         sleep 10
-        docker logs test-bot
-        docker stop test-bot
+        docker compose logs web3-discord-bot
+        docker compose down
     
     - name: Push Docker image to GHCR
       if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev'

@@ -1,5 +1,5 @@
 # Multi-stage build for production
-FROM node:20.19-alpine3.21 AS builder
+FROM node:20-alpine AS builder
 
 # Set working directory
 WORKDIR /usr/src/app
@@ -16,9 +16,8 @@ RUN npm ci
 # Copy source code
 COPY . .
 
-
-# Production stage
-FROM 20.19-alpine3.21 AS production
+# Development stage
+FROM node:20-alpine AS development
 
 # Create non-root user for security
 RUN addgroup -g 1001 -S nodejs && \
@@ -27,10 +26,8 @@ RUN addgroup -g 1001 -S nodejs && \
 # Set working directory
 WORKDIR /usr/src/app
 
-# Copy package files
+# Copy package files and install only production dependencies
 COPY package*.json ./
-
-# Install only production dependencies
 RUN npm ci --only=production && \
     npm cache clean --force
 
