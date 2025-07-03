@@ -73,16 +73,20 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    - name: Pull Docker image from build job
-      run: |
-        # The image is already built in the build job
-        # This step ensures we have the image for scanning
-        echo "Using image built in previous job"
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Pull Docker image from GHCR
+      run: docker pull ghcr.io/${{ github.repository }}:${{ github.sha }}
     
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@master
       with:
-        image-ref: 'web3-discord-bot:latest'
+        image-ref: 'ghcr.io/${{ github.repository }}:${{ github.sha }}'
         format: 'sarif'
         output: 'trivy-results.sarif'
         severity: 'CRITICAL,HIGH'
