@@ -234,7 +234,7 @@ class Web3Service {
     }));
   }
 
-  static isValidAddress(address) {
+  static isValidAddress (address) {
     if (!address || typeof address !== 'string') return false;
     return /^0x[a-fA-F0-9]{40}$/.test(address);
   }

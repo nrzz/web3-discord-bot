@@ -24,6 +24,14 @@ module.exports = {
   ignorePatterns: [
     'node_modules/',
     'logs/',
-    '*.log'
+    '*.log',
+    '__tests__/',
+    '**/__tests__/',
+    '**/*.test.js',
+    '**/*.spec.js',
+    '**/*.test.ts',
+    '**/*.spec.ts',
+    'test/',
+    'tests/'
   ]
 }; 
