@@ -64,13 +64,39 @@ jobs:
 
   security:
     runs-on: ubuntu-latest
+    needs: build
     
     steps:
     - uses: actions/checkout@v4
     
-    - name: Run security scan
-      uses: snyk/actions/node@master
-      env:
-        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+    - name: Build Docker image
+      run: docker build -t web3-discord-bot .
+    
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
       with:
-        args: --severity-threshold=high 
+        image-ref: 'web3-discord-bot:latest'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+        severity: 'CRITICAL,HIGH'
+    
+    - name: Upload Trivy scan results to GitHub Security tab
+      uses: github/codeql-action/upload-sarif@v3
+      if: always()
+      with:
+        sarif_file: 'trivy-results.sarif'
+
+  # Alternative: Grype scanner (even simpler)
+  # grype-security:
+  #   runs-on: ubuntu-latest
+  #   needs: build
+  #   
+  #   steps:
+  #   - uses: actions/checkout@v4
+  #   
+  #   - name: Build Docker image
+  #     run: docker build -t web3-discord-bot .
+  #   
+  #   - name: Run Grype vulnerability scanner
+  #     run: |
+  #       docker run --rm -v /var/run/docker.sock:/var/run/docker.sock anchore/grype:latest web3-discord-bot:latest 
