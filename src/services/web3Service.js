@@ -233,6 +233,11 @@ class Web3Service {
       configured: !!this.providers.get(network)
     }));
   }
+
+  static isValidAddress(address) {
+    if (!address || typeof address !== 'string') return false;
+    return /^0x[a-fA-F0-9]{40}$/.test(address);
+  }
 }
 
 // Create singleton instance
@@ -245,5 +250,6 @@ async function initializeWeb3Providers () {
 
 module.exports = {
   web3Service,
-  initializeWeb3Providers
+  initializeWeb3Providers,
+  isValidAddress: Web3Service.isValidAddress
 };
