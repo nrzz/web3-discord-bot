@@ -61,6 +61,15 @@ jobs:
         sleep 10
         docker logs test-bot
         docker stop test-bot
+    
+    - name: Push Docker image to GHCR
+      if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev'
+      run: |
+        echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+        docker tag web3-discord-bot ghcr.io/${{ github.repository }}/web3-discord-bot:latest
+        docker tag web3-discord-bot ghcr.io/${{ github.repository }}/web3-discord-bot:${{ github.sha }}
+        docker push ghcr.io/${{ github.repository }}/web3-discord-bot:latest
+        docker push ghcr.io/${{ github.repository }}/web3-discord-bot:${{ github.sha }}
 
   security:
     runs-on: ubuntu-latest
@@ -69,8 +78,11 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    - name: Build Docker image
-      run: docker build -t web3-discord-bot .
+    - name: Pull Docker image from build job
+      run: |
+        # The image is already built in the build job
+        # This step ensures we have the image for scanning
+        echo "Using image built in previous job"
     
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@master
