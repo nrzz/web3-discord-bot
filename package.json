@@ -31,8 +31,7 @@
     "winston": "^3.11.0",
     "winston-daily-rotate-file": "^4.7.1",
     "axios": "^1.6.2",
-    "node-cron": "^3.0.3",
-    "crypto": "^1.0.1"
+    "node-cron": "^3.0.3"
   },
   "devDependencies": {
     "nodemon": "^3.0.2",
