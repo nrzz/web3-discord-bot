@@ -1,5 +1,9 @@
 # Web3 Discord Bot
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Node.js](https://img.shields.io/badge/Node.js-18+-339933)](https://nodejs.org/)
+[![Discord.js](https://img.shields.io/badge/Discord.js-14-5865F2)](https://discord.js.org/)
+
 A production-ready Discord bot for checking Web3 wallet balances across multiple blockchains. Built with Node.js, Discord.js, and Ethers.js.
 
 ## 🌟 Features
@@ -35,7 +39,7 @@ A production-ready Discord bot for checking Web3 wallet balances across multiple
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/nrzz/web3-discord-bot.git
    cd web3-discord-bot
    ```
 
