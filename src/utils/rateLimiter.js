@@ -4,13 +4,23 @@ const logger = require('./logger');
 // In-memory store for rate limiting (in production, use Redis)
 // const rateLimitStore = new Map();
 
+function getCommandRateLimitConfig () {
+  return {
+    maxRequests: parseInt(process.env.COMMAND_RATE_LIMIT_MAX, 10) || 5,
+    windowMs: parseInt(process.env.COMMAND_RATE_LIMIT_WINDOW_MS, 10) || 60000
+  };
+}
+
 class RateLimiter {
   constructor () {
     this.limits = new Map();
   }
 
   // Check if user is rate limited
-  isRateLimited (userId, commandName, maxRequests = 5, windowMs = 60000) {
+  isRateLimited (userId, commandName, maxRequests, windowMs) {
+    const config = getCommandRateLimitConfig();
+    maxRequests = maxRequests ?? config.maxRequests;
+    windowMs = windowMs ?? config.windowMs;
     const key = `${userId}:${commandName}`;
     const now = Date.now();
 
@@ -46,19 +56,20 @@ class RateLimiter {
 
   // Get remaining requests for user
   getRemainingRequests (userId, commandName) {
+    const { maxRequests } = getCommandRateLimitConfig();
     const key = `${userId}:${commandName}`;
     const limit = this.limits.get(key);
 
     if (!limit) {
-      return 5; // Default max requests
+      return maxRequests;
     }
 
     const now = Date.now();
     if (now > limit.resetTime) {
-      return 5;
+      return maxRequests;
     }
 
-    return Math.max(0, 5 - limit.requests);
+    return Math.max(0, maxRequests - limit.requests);
   }
 
   // Get reset time for user
@@ -112,7 +123,40 @@ function setupRateLimiting () {
   });
 }
 
+function wrapCommandWithRateLimit (command) {
+  const originalExecute = command.execute.bind(command);
+
+  return {
+    ...command,
+    async execute (interaction) {
+      const userId = interaction.user.id;
+      const commandName = command.data.name;
+
+      if (globalRateLimiter.isRateLimited(userId, commandName)) {
+        const resetTime = globalRateLimiter.getResetTime(userId, commandName);
+        const timeLeft = Math.ceil((resetTime - Date.now()) / 1000);
+
+        const payload = {
+          content: `Rate limit exceeded. Please wait ${timeLeft} seconds before using this command again.`,
+          ephemeral: true
+        };
+
+        if (interaction.replied || interaction.deferred) {
+          await interaction.followUp(payload);
+        } else {
+          await interaction.reply(payload);
+        }
+        return;
+      }
+
+      return originalExecute(interaction);
+    }
+  };
+}
+
 module.exports = {
   globalRateLimiter,
-  setupRateLimiting
+  setupRateLimiting,
+  wrapCommandWithRateLimit,
+  getCommandRateLimitConfig
 };

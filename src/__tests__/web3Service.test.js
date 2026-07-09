@@ -58,6 +58,17 @@ describe('Web3Service', () => {
     });
   });
 
+  describe('getTopTokens', () => {
+    test('should return valid Ethereum USDC contract address', async () => {
+      const tokens = await web3Service.getTopTokens('ethereum');
+      const usdc = tokens.find(token => token.symbol === 'USDC');
+
+      expect(usdc).toBeDefined();
+      expect(usdc.address).toBe('0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48');
+      expect(isValidAddress(usdc.address)).toBe(true);
+    });
+  });
+
   describe('error handling', () => {
     test('should handle network not configured error', async () => {
       await expect(

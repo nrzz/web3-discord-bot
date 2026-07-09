@@ -39,14 +39,12 @@ jobs:
           fi
       
       - name: Run linter
-        run: npm run lint || true
-        continue-on-error: true
+        run: npm run lint
       
       - name: Run tests
-        run: npm test || echo "Tests completed"
+        run: npm test
         env:
           NODE_ENV: test
-        continue-on-error: true
       
       - name: Verify build
         run: node -c src/index.js

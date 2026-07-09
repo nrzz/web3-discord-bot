@@ -1,5 +1,4 @@
 const logger = require('../utils/logger');
-const { globalRateLimiter } = require('../utils/rateLimiter');
 
 module.exports = {
   name: 'interactionCreate',
@@ -13,20 +12,8 @@ module.exports = {
       return;
     }
 
-    // Rate limiting
     const userId = interaction.user.id;
     const commandName = interaction.commandName;
-
-    if (globalRateLimiter.isRateLimited(userId, commandName)) {
-      const resetTime = globalRateLimiter.getResetTime(userId, commandName);
-      const timeLeft = Math.ceil((resetTime - Date.now()) / 1000);
-
-      await interaction.reply({
-        content: `⏰ Rate limit exceeded! Please wait ${timeLeft} seconds before using this command again.`,
-        ephemeral: true
-      });
-      return;
-    }
 
     try {
       logger.info(`Executing command ${commandName} for user ${interaction.user.tag} (${userId})`);

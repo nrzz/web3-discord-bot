@@ -34,14 +34,12 @@ jobs:
           fi
       
       - name: Run linter
-        run: npm run lint || true
-        continue-on-error: true
+        run: npm run lint
       
       - name: Run tests
-        run: npm test || true
+        run: npm test
         env:
           NODE_ENV: test
-        continue-on-error: true
       
       - name: Check for security vulnerabilities
         run: npm audit --audit-level=moderate

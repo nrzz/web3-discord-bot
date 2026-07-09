@@ -13,7 +13,6 @@ process.env.PORT = '3000';
 process.env.RATE_LIMIT_WINDOW_MS = '900000';
 process.env.RATE_LIMIT_MAX_REQUESTS = '100';
 process.env.LOG_LEVEL = 'error'; // Reduce log noise during tests
-process.env.ENCRYPTION_KEY = 'test-encryption-key-32-chars-long';
 
 // Global test timeout
 jest.setTimeout(10000);
@@ -97,6 +96,7 @@ global.testUtils = {
       })
     },
     user: {
+      id: options.userId || 'test-user-id',
       tag: 'TestUser#1234',
       displayAvatarURL: jest.fn().mockReturnValue('https://example.com/avatar.png')
     },

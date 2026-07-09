@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const logger = require('../utils/logger');
+const { wrapCommandWithRateLimit } = require('../utils/rateLimiter');
 
 async function loadCommands (client) {
   const commandsPath = path.join(__dirname, '../commands');
@@ -15,7 +16,7 @@ async function loadCommands (client) {
       const command = require(filePath);
 
       if ('data' in command && 'execute' in command) {
-        client.commands.set(command.data.name, command);
+        client.commands.set(command.data.name, wrapCommandWithRateLimit(command));
         logger.info(`Loaded command: ${command.data.name}`);
       } else {
         logger.warn(`The command at ${filePath} is missing a required "data" or "execute" property.`);

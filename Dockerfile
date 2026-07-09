@@ -33,7 +33,6 @@ RUN npm ci --only=production && \
 
 # Copy source code from builder stage
 COPY --from=builder /usr/src/app/src ./src
-COPY --from=builder /usr/src/app/deploy-commands.js ./
 
 # Create logs directory and set permissions
 RUN mkdir -p logs && \
@@ -49,9 +48,6 @@ EXPOSE 3000
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
   CMD node -e "require('http').get('http://localhost:3000/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })" || exit 1
-
-# Deploy Discord commands before starting
-RUN node deploy-commands.js || true
 
 # Start the application
 CMD ["npm", "start"] 
