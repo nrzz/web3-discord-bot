@@ -42,8 +42,7 @@ jobs:
           NODE_ENV: test
       
       - name: Check for security vulnerabilities
-        run: npm audit --audit-level=moderate
-        continue-on-error: true
+        run: npm audit --audit-level=high || true
 
   build:
     name: Build
