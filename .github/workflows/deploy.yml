@@ -1,8 +1,6 @@
 name: Deploy
 
 on:
-  push:
-    branches: [ main, master ]
   workflow_dispatch:
     inputs:
       environment:
@@ -13,136 +11,142 @@ on:
         options:
           - production
           - staging
+      push_images:
+        description: 'Push image to GHCR (requires package write permission)'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+  packages: write
 
 jobs:
-  # Pre-deployment tests
   pre-deploy-tests:
     name: Pre-Deployment Tests
     runs-on: ubuntu-latest
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
-          cache-dependency-path: package.json
-      
+          cache-dependency-path: package-lock.json
+
       - name: Install dependencies
-        run: |
-          if [ -f package-lock.json ]; then
-            npm ci
-          else
-            npm install
-          fi
-      
+        run: npm ci
+
       - name: Run linter
         run: npm run lint
-      
+
       - name: Run tests
         run: npm test
         env:
           NODE_ENV: test
-      
+
       - name: Verify build
         run: node -c src/index.js
-      
-      - name: Check for security vulnerabilities
-        run: npm audit --audit-level=moderate || true
-        continue-on-error: true
 
-  # Build Docker image
   build-docker:
     name: Build Docker Image
     runs-on: ubuntu-latest
     needs: [pre-deploy-tests]
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-      
+
       - name: Log in to Container Registry
+        if: inputs.push_images
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      
+
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
           context: .
           file: ./Dockerfile
-          push: true
+          push: ${{ inputs.push_images }}
           tags: |
-            ghcr.io/${{ github.repository }}:latest
-            ghcr.io/${{ github.repository }}:${{ github.sha }}
+            ghcr.io/${{ github.repository_owner }}/web3-discord-bot:latest
+            ghcr.io/${{ github.repository_owner }}/web3-discord-bot:${{ github.sha }}
 
-  # Deploy to self-hosted server
   deploy-self-hosted:
     name: Deploy to Self-Hosted Server
     runs-on: ubuntu-latest
     needs: [build-docker]
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
-    
+
     steps:
+      - name: Check deploy secrets
+        id: deploy
+        run: |
+          if [ -n "$SSH_KEY" ] && [ -n "$HOST" ] && [ -n "$USER" ]; then
+            echo "configured=true" >> $GITHUB_OUTPUT
+          else
+            echo "configured=false" >> $GITHUB_OUTPUT
+            echo "Deploy secrets not configured — skipping deployment."
+          fi
+        env:
+          SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          HOST: ${{ secrets.DEPLOY_HOST }}
+          USER: ${{ secrets.DEPLOY_USER }}
+
       - uses: actions/checkout@v4
-      
+        if: steps.deploy.outputs.configured == 'true'
+
       - name: Setup SSH
+        if: steps.deploy.outputs.configured == 'true'
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
-      
+
       - name: Add server to known hosts
+        if: steps.deploy.outputs.configured == 'true'
         run: |
           mkdir -p ~/.ssh
           ssh-keyscan -H ${{ secrets.DEPLOY_HOST }} >> ~/.ssh/known_hosts
-      
+
       - name: Deploy to server
+        if: steps.deploy.outputs.configured == 'true'
         run: |
           ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} << 'EOF'
             set -e
             cd /opt/web3-discord-bot || mkdir -p /opt/web3-discord-bot && cd /opt/web3-discord-bot
-            
-            # Login to registry
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-            
-            # Pull latest image
-            docker pull ghcr.io/${{ github.repository }}:latest
-            
-            # Stop existing container
+            docker pull ghcr.io/${{ github.repository_owner }}/web3-discord-bot:latest
             docker-compose down || true
-            
-            # Update and start
             docker-compose up -d --build
-            
-            # Wait for service
             sleep 10
-            
-            # Health check
             curl -f http://localhost:3000/health || echo "Health check endpoint not available"
-            
-            echo "✅ Deployment successful"
+            echo "Deployment successful"
           EOF
-        continue-on-error: true
 
-  # Verify deployment
   verify-deployment:
     name: Verify Deployment
     runs-on: ubuntu-latest
     needs: [deploy-self-hosted]
-    if: always() && (needs.deploy-self-hosted.result == 'success' || needs.deploy-self-hosted.result == 'skipped')
-    
+
     steps:
-      - name: Check deployment URL
+      - name: Check deploy URL
+        id: url
         run: |
-          if [ -n "${{ secrets.DEPLOY_URL }}" ]; then
-            curl -f "${{ secrets.DEPLOY_URL }}/health" || echo "Health check failed"
+          if [ -n "$DEPLOY_URL" ]; then
+            echo "configured=true" >> $GITHUB_OUTPUT
           else
-            echo "⚠️ DEPLOY_URL not set, skipping verification"
+            echo "configured=false" >> $GITHUB_OUTPUT
+            echo "DEPLOY_URL not set — skipping verification."
           fi
-        continue-on-error: true
+        env:
+          DEPLOY_URL: ${{ secrets.DEPLOY_URL }}
+
+      - name: Check deployment URL
+        if: steps.url.outputs.configured == 'true'
+        run: curl -f "${{ secrets.DEPLOY_URL }}/health"
