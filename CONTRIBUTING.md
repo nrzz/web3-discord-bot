@@ -36,7 +36,7 @@ Thank you for your interest in contributing to Web3 Discord Bot! This document p
 ### Local Development
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/web3-discord-bot.git
+git clone https://github.com/nrzz/web3-discord-bot.git
 cd web3-discord-bot
 
 # Install dependencies
