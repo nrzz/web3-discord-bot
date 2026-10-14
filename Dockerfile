@@ -1,5 +1,5 @@
 # Multi-stage build for production
-FROM node:20-alpine AS builder
+FROM node:22-alpine AS builder
 
 # Set working directory
 WORKDIR /usr/src/app
@@ -17,7 +17,7 @@ RUN npm ci
 COPY . .
 
 # Development stage
-FROM node:20-alpine AS development
+FROM node:22-alpine AS development
 
 # Create non-root user for security
 RUN addgroup -g 1001 -S nodejs && \
