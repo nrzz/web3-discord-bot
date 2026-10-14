@@ -4,7 +4,7 @@ Get your Web3 Discord Bot up and running in about 5 minutes.
 
 ## Prerequisites
 
-- Node.js 18.0.0 or higher
+- Node.js 20.0.0 or higher
 - A Discord bot token ([Discord Developer Portal](https://discord.com/developers/applications))
 - An Ethereum RPC URL (Infura, Alchemy, or another provider)
 

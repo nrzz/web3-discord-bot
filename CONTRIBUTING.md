@@ -29,7 +29,7 @@ Thank you for your interest in contributing to Web3 Discord Bot! This document p
 ## 🛠️ Development Setup
 
 ### Prerequisites
-- Node.js 18.0.0 or higher
+- Node.js 20.0.0 or higher
 - npm or yarn
 - Git
 

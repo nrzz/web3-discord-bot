@@ -1,7 +1,7 @@
 # Web3 Discord Bot
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Node.js](https://img.shields.io/badge/Node.js-18+-339933)](https://nodejs.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-20+-339933)](https://nodejs.org/)
 [![Discord.js](https://img.shields.io/badge/Discord.js-14-5865F2)](https://discord.js.org/)
 
 A production-ready Discord bot for checking Web3 wallet balances across multiple blockchains. Built with Node.js, Discord.js, and Ethers.js.
@@ -31,7 +31,7 @@ A production-ready Discord bot for checking Web3 wallet balances across multiple
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 18.0.0 or higher
+- Node.js 20.0.0 or higher
 - Discord Bot Token
 - Ethereum RPC URL (Infura, Alchemy, etc.)
 

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+- Dependency audit: 14 known vulnerabilities in the lockfile (express, body-parser, path-to-regexp, proxy-addr, qs, lodash, moment, undici, ws via ethers and discord.js) fixed with `npm audit fix`; node-cron 3 to 4 for the uuid advisory
+
+### Changed
+- Node.js 20 or newer is required (node-cron 4 needs it); CI tests on Node 20 and 22 and the Docker image builds on `node:22-alpine`
+
 ### Added
 - GitHub Actions CI/CD pipeline
 - Issue and PR templates
